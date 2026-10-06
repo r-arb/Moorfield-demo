@@ -1,0 +1,702 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Moorfield Plumbing &amp; Heating</title>
+<!--
+  MOORFIELD PLUMBING & HEATING: portfolio demo site
+  -------------------------------------------------
+  A one-page website for a made-up local plumber.
+
+  How this file is organised, top to bottom:
+    1. <link>   loads two fonts from Google Fonts
+    2. <style>  every design rule (CSS): colours, fonts, spacing, layout
+    3. HTML     the page content, one section at a time
+    4. <script> a few lines of JavaScript for the quote form
+
+  Search for "EDIT ME" to find the parts you'd change for a real client.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Public+Sans:wght@400;500;600;700&display=swap">
+
+<style>
+/* Layout: van-livery hero band ending in a copper pipe, then a price board,
+   callout steps, postcode chips and a contact block. Mobile first,
+   with a sticky call bar on phones. */
+
+/* ---------- 1. DESIGN TOKENS ----------
+   These variables hold every colour and font in one place.
+   Change a value here and it changes everywhere it's used.  EDIT ME */
+:root {
+  --bg: #f2f5f6;           /* page background: cool off-white */
+  --surface: #ffffff;      /* panels and the price board */
+  --ink: #13242c;          /* main text */
+  --muted: #4f6570;        /* secondary text */
+  --line: #d3dde1;         /* borders and dividers */
+  --band: #123a47;         /* dark teal header and hero */
+  --band-ink: #eef5f7;     /* text on the dark band */
+  --band-muted: #a9c3cc;   /* quieter text on the band */
+  --copper: #a85a27;       /* accent colour, like copper pipe */
+  --copper-hover: #8c4a1f; /* button colour on hover */
+  --on-copper: #ffffff;    /* text on copper buttons */
+  --copper-soft: #f6e7dc;  /* pale copper tint */
+  --pipe-hi: #e9a77a;      /* copper pipe highlight */
+  --pipe-lo: #7a3d17;      /* copper pipe shadow */
+  --brass: #c9a227;        /* pipe fittings */
+  --brass-lo: #8f7116;
+
+  --font-display: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+  --font-body: "Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+
+  --wrap: 68rem;           /* maximum width of the content */
+  --radius: 6px;           /* corner rounding */
+}
+
+/* Dark mode: the browser uses these colours when the visitor's
+   phone or computer is set to dark mode. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d181d; --surface: #14232a; --ink: #e4edf0; --muted: #9db1ba;
+    --line: #263f49; --band: #0b2b35; --band-ink: #e4edf0; --band-muted: #9cbac4;
+    --copper: #e08a52; --copper-hover: #eda271; --on-copper: #1b0f07; --copper-soft: #33221a;
+    --pipe-hi: #f0b48a; --pipe-lo: #8a4720; --brass: #d9b23a; --brass-lo: #9a7c1c;
+    color-scheme: dark;
+  }
+}
+/* The same dark colours again, for viewers that switch theme by hand. */
+:root[data-theme="dark"] {
+  --bg: #0d181d; --surface: #14232a; --ink: #e4edf0; --muted: #9db1ba;
+  --line: #263f49; --band: #0b2b35; --band-ink: #e4edf0; --band-muted: #9cbac4;
+  --copper: #e08a52; --copper-hover: #eda271; --on-copper: #1b0f07; --copper-soft: #33221a;
+  --pipe-hi: #f0b48a; --pipe-lo: #8a4720; --brass: #d9b23a; --brass-lo: #9a7c1c;
+  color-scheme: dark;
+}
+
+/* ---------- 2. BASICS ---------- */
+* { box-sizing: border-box; } /* widths include padding, so layouts add up */
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  padding-bottom: 4.75rem; /* room for the call bar on phones */
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+h1, h2, h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--brass); outline-offset: 3px; }
+
+/* .wrap centres the content and keeps a 16px gap from the screen edge */
+.wrap { max-width: var(--wrap); margin-inline: auto; padding-inline: 1rem; }
+
+.eyebrow {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--copper);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;              /* big enough to tap with a thumb */
+  padding: 0.7rem 1.25rem;
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+.btn-primary { background: var(--copper); color: var(--on-copper); }
+.btn-primary:hover { background: var(--copper-hover); }
+.btn-ghost { background: transparent; color: inherit; border-color: currentColor; }
+.btn-ghost:hover { background: var(--band-ink); color: var(--band); border-color: var(--band-ink); }
+
+/* ---------- 3. DEMO NOTICE ---------- */
+.demo-note { background: var(--copper-soft); color: var(--ink); font-size: 0.85rem; }
+.demo-note .wrap { padding-block: 0.5rem; }
+
+/* ---------- 4. HEADER ---------- */
+.site-header { background: var(--band); color: var(--band-ink); }
+.site-header .wrap {
+  display: flex;                 /* puts logo and phone side by side */
+  flex-wrap: wrap;               /* ...and lets them stack if space runs out */
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  padding-block: 1rem;
+}
+.logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+.logo-mark { flex: none; }
+.logo-mark path { stroke: var(--pipe-hi); }
+.logo-mark rect { fill: var(--brass); }
+.logo-name {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.logo-sub, .header-phone small {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--band-muted);
+}
+.header-phone {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 5. HERO ---------- */
+.hero { background: var(--band); color: var(--band-ink); }
+.hero .wrap { display: grid; gap: 1.25rem; padding-block: 1.5rem 2.75rem; }
+.hero .eyebrow { color: var(--pipe-hi); }
+.hero h1 {
+  max-width: 16ch;
+  font-size: clamp(2.6rem, 9vw, 4.75rem);  /* grows with screen width, within limits */
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.hero-lede { max-width: 36rem; font-size: 1.125rem; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+
+/* The tick list. Each tick is drawn with CSS borders, not an image. */
+.trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+.trust li { display: flex; align-items: center; gap: 0.6rem; }
+.trust li::before {
+  content: "";
+  flex: none;
+  width: 0.4rem;
+  height: 0.8rem;
+  margin-left: 0.2rem;
+  border: solid var(--pipe-hi);
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg) translateY(-2px);
+}
+
+/* The copper pipe: one strip shaded top to bottom so it looks round.
+   The two brass fittings are drawn by ::before and ::after. */
+.pipe {
+  position: relative;
+  height: 14px;
+  background: linear-gradient(to bottom, var(--pipe-hi), var(--copper) 55%, var(--pipe-lo));
+}
+.pipe::before, .pipe::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  width: 2.25rem;
+  height: 22px;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, var(--brass), var(--brass-lo));
+}
+.pipe::before { left: 14%; }
+.pipe::after { right: 20%; }
+
+/* ---------- 6. SECTIONS ---------- */
+.section { padding-block: 3.5rem; }
+.section-alt { background: var(--surface); border-block: 1px solid var(--line); }
+.section-head { display: grid; gap: 0.5rem; max-width: 40rem; margin-bottom: 1.75rem; }
+.section-head h2 {
+  font-size: clamp(2rem, 6vw, 2.75rem);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.section-head p { color: var(--muted); }
+
+/* .split: heading on the left, content on the right (on wide screens) */
+.split { display: grid; gap: 1.5rem; }
+.split > .section-head { margin-bottom: 0; }
+
+/* ---------- 7. PRICE BOARD ---------- */
+.prices {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.price {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto; /* text column, then price column */
+  gap: 0.2rem 1rem;
+  padding: 1rem 1.15rem;
+  border-top: 1px solid var(--line);
+}
+.price:first-child { border-top: 0; }
+.price h3 { grid-column: 1; grid-row: 1; font-size: 1.3rem; }
+.price p { grid-column: 1; grid-row: 2; color: var(--muted); font-size: 0.92rem; }
+.price-amount {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  align-self: center;
+  text-align: right;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.price-amount small {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.price-note { margin-top: 0.85rem; color: var(--muted); font-size: 0.85rem; }
+
+/* ---------- 8. HOW A CALLOUT WORKS ---------- */
+.steps {
+  display: grid;
+  gap: 1.75rem 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;           /* CSS counts the steps for us */
+}
+.step {
+  display: grid;
+  gap: 0.4rem;
+  align-content: start;
+  padding-top: 1rem;
+  border-top: 3px solid var(--copper);
+  counter-increment: step;
+}
+.step::before {
+  content: counter(step);        /* prints 1, 2, 3, 4 */
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--copper);
+}
+.step h3 { font-size: 1.35rem; }
+.step p { color: var(--muted); }
+
+/* ---------- 9. AREAS COVERED ---------- */
+.areas { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0; padding: 0; list-style: none; }
+.area {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+.area b { font-family: var(--font-display); font-size: 1.25rem; letter-spacing: 0.04em; }
+.area span { color: var(--muted); font-size: 0.9rem; }
+
+/* ---------- 10. CONTACT AND QUOTE FORM ---------- */
+.contact-grid { display: grid; gap: 2.25rem; }
+.contact-info { display: grid; gap: 1rem; align-content: start; min-width: 0; }
+.contact-info .section-head { margin-bottom: 0.25rem; }
+.contact-phone {
+  justify-self: start;
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--copper);
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+}
+.contact-email { color: var(--muted); overflow-wrap: anywhere; }
+
+.hours { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.hours caption {
+  padding-bottom: 0.4rem;
+  text-align: left;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.hours th, .hours td { padding: 0.55rem 0; border-bottom: 1px solid var(--line); }
+.hours th { text-align: left; font-weight: 500; }
+.hours td { text-align: right; font-weight: 600; }
+.hours .urgent th, .hours .urgent td { color: var(--copper); font-weight: 700; }
+
+.quote {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+  padding: 1.25rem;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.quote h3 { font-size: 1.5rem; }
+.field { display: grid; gap: 0.35rem; min-width: 0; }
+.field label { font-size: 0.92rem; font-weight: 600; }
+.field-row { display: grid; gap: 1rem; }
+input, select, textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 0.7rem 0.8rem;
+  font: inherit;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+textarea { min-height: 7rem; resize: vertical; }
+.form-note {
+  padding: 0.8rem 1rem;
+  background: var(--copper-soft);
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+}
+
+/* ---------- 11. FOOTER ---------- */
+.site-footer { background: var(--band); color: var(--band-muted); font-size: 0.875rem; }
+.site-footer .wrap { display: grid; gap: 0.35rem; padding-block: 2rem; }
+
+/* ---------- 12. MOBILE CALL BAR ---------- */
+.call-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem calc(0.6rem + env(safe-area-inset-bottom, 0px));
+  background: var(--band);
+  color: var(--band-ink);
+  box-shadow: 0 -1px 0 var(--line);
+}
+
+/* ---------- 13. WIDER SCREENS ----------
+   Media queries apply rules only above a certain width.
+   Everything above is the phone layout; these rules upgrade it. */
+@media (min-width: 36rem) {
+  .field-row { grid-template-columns: 1fr 1fr; }
+  .steps { grid-template-columns: 1fr 1fr; }
+}
+@media (min-width: 48rem) {
+  body { padding-bottom: 0; }
+  .call-bar { display: none; }   /* desktop visitors see the phone number in the header */
+  .wrap { padding-inline: 2rem; }
+  .section { padding-block: 4.5rem; }
+  .hero .wrap { padding-block: 2.5rem 3.75rem; }
+  .quote { padding: 1.75rem; }
+}
+@media (min-width: 60rem) {
+  .split { grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: 3rem; align-items: start; }
+  .steps { grid-template-columns: repeat(4, 1fr); }
+  .contact-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 3rem; }
+}
+
+/* Turn off movement for people who've asked their device for less motion */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; }
+}
+</style>
+
+
+<!-- ===== DEMO NOTICE =====
+     Delete this strip when you reuse the design for a real client. -->
+<div class="demo-note" role="note">
+  <div class="wrap"><strong>Portfolio demo.</strong> Moorfield Plumbing &amp; Heating is a made-up business, and the phone number is one Ofcom reserves for fiction.</div>
+</div>
+
+
+<!-- ===== HEADER =====
+     Logo on the left, phone number on the right.
+     A "tel:" link opens the phone's dialler when tapped.  EDIT ME -->
+<header class="site-header" id="top">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="Moorfield Plumbing and Heating, back to top">
+      <!-- The logo is a small drawing (SVG) of a pipe elbow -->
+      <svg class="logo-mark" viewBox="0 0 40 40" width="40" height="40" aria-hidden="true">
+        <path d="M4 12 H18 A10 10 0 0 1 28 22 V36" fill="none" stroke-width="7"/>
+        <rect x="2" y="7" width="5" height="10" rx="1"/>
+        <rect x="23" y="33" width="10" height="5" rx="1"/>
+      </svg>
+      <span>
+        <span class="logo-name">Moorfield</span>
+        <span class="logo-sub">Plumbing &amp; Heating</span>
+      </span>
+    </a>
+    <a class="header-phone" href="tel:+447700900382">07700 900382<small>24/7 for leaks and no heat</small></a>
+  </div>
+</header>
+
+
+<!-- ===== HERO =====
+     The first thing visitors see. It answers three questions fast:
+     what do you do, where, and how do I get hold of you?  EDIT ME -->
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap">
+    <p class="eyebrow">Plumbers in Moorfield · MF1 to MF4</p>
+    <h1 id="hero-title">Leaks, boilers and bathrooms. Fixed price before we start.</h1>
+    <p class="hero-lede">Gas Safe registered engineers based in Moorfield. Same-day callouts for leaks and no heat, and a written price before any work begins.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="tel:+447700900382">Call 07700 900382</a>
+      <a class="btn btn-ghost" href="#quote">Get a free quote</a>
+    </div>
+    <ul class="trust">
+      <li>Gas Safe registered</li>
+      <li>12-month guarantee on all work</li>
+      <li>No callout fee in MF1 to MF4</li>
+    </ul>
+  </div>
+  <!-- Decorative copper pipe. aria-hidden tells screen readers to skip it. -->
+  <div class="pipe" aria-hidden="true"></div>
+</section>
+
+
+<!-- ===== PRICES =====
+     "From" prices build trust, and most small trade sites hide them.
+     Each service is one <li> block. Copy a block to add a service.  EDIT ME -->
+<section class="section" id="prices" aria-labelledby="prices-title">
+  <div class="wrap split">
+    <div class="section-head">
+      <p class="eyebrow">Prices</p>
+      <h2 id="prices-title">Common jobs and what they cost</h2>
+      <p>For anything bigger, we visit, take a look and give you a written quote for free.</p>
+    </div>
+    <div>
+      <ul class="prices">
+        <li class="price">
+          <h3>Leak and tap repairs</h3>
+          <p>Dripping taps, leaking pipes and sticking valves</p>
+          <span class="price-amount"><small>from</small>£85</span>
+        </li>
+        <li class="price">
+          <h3>Boiler service</h3>
+          <p>Annual service and safety check, with a written report</p>
+          <span class="price-amount"><small>fixed</small>£79</span>
+        </li>
+        <li class="price">
+          <h3>Boiler breakdown</h3>
+          <p>Diagnosis and the first hour of labour. Parts priced before fitting</p>
+          <span class="price-amount"><small>from</small>£95</span>
+        </li>
+        <li class="price">
+          <h3>Landlord gas safety certificate (CP12)</h3>
+          <p>Every gas appliance checked, certificate emailed the same day</p>
+          <span class="price-amount"><small>fixed</small>£65</span>
+        </li>
+        <li class="price">
+          <h3>Radiator replacement</h3>
+          <p>Like-for-like swap, including new valves</p>
+          <span class="price-amount"><small>from</small>£160</span>
+        </li>
+        <li class="price">
+          <h3>Power flush</h3>
+          <p>Clears sludge from your heating system, up to 10 radiators</p>
+          <span class="price-amount"><small>from</small>£395</span>
+        </li>
+        <li class="price">
+          <h3>New combi boiler</h3>
+          <p>Supplied, fitted and registered, with up to 10 years' manufacturer warranty</p>
+          <span class="price-amount"><small>from</small>£2,250</span>
+        </li>
+        <li class="price">
+          <h3>Bathroom refit</h3>
+          <p>Free home visit and an itemised written quote</p>
+          <span class="price-amount"><small>free</small>Quote</span>
+        </li>
+      </ul>
+      <p class="price-note">All prices include VAT. Demo prices only.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ===== HOW A CALLOUT WORKS =====
+     An ordered list (<ol>) because the steps happen in order.
+     The big numbers come from CSS counters, so they renumber themselves. -->
+<section class="section section-alt" aria-labelledby="steps-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">How a callout works</p>
+      <h2 id="steps-title">From your call to a finished job</h2>
+    </div>
+    <ol class="steps">
+      <li class="step">
+        <h3>Call or send the form</h3>
+        <p>Tell us what's wrong. You get an arrival window, usually the same day for leaks and no heat.</p>
+      </li>
+      <li class="step">
+        <h3>We find the fault and price it</h3>
+        <p>The engineer agrees a fixed price with you before starting any work.</p>
+      </li>
+      <li class="step">
+        <h3>We fix it</h3>
+        <p>Most jobs are finished in one visit, because our vans carry the common parts.</p>
+      </li>
+      <li class="step">
+        <h3>It's guaranteed</h3>
+        <p>12 months on our labour, and boiler installs are registered with Gas Safe.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+
+<!-- ===== AREAS COVERED =====
+     Naming real local areas helps Google show the business
+     to people searching nearby (this is "local SEO").  EDIT ME -->
+<section class="section" id="areas" aria-labelledby="areas-title">
+  <div class="wrap split">
+    <div class="section-head">
+      <p class="eyebrow">Where we work</p>
+      <h2 id="areas-title">Moorfield and nearby villages</h2>
+      <p>No callout fee inside these postcodes. Villages up to 10 miles out are covered for a £15 travel charge.</p>
+    </div>
+    <ul class="areas">
+      <li class="area"><b>MF1</b><span>Town centre</span></li>
+      <li class="area"><b>MF2</b><span>Highfield</span></li>
+      <li class="area"><b>MF3</b><span>Riverside</span></li>
+      <li class="area"><b>MF4</b><span>Upper Moorfield</span></li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ===== CONTACT AND QUOTE FORM =====
+     Left: phone, email and opening hours. Right: the quote form.
+     On a real site the form needs somewhere to send messages.
+     Netlify Forms (add data-netlify="true" to the <form> tag)
+     or Formspree both work without writing any server code.  EDIT ME -->
+<section class="section section-alt" id="quote" aria-labelledby="quote-title">
+  <div class="wrap contact-grid">
+    <div class="contact-info">
+      <div class="section-head">
+        <p class="eyebrow">Get in touch</p>
+        <h2 id="quote-title">Ask for a free quote</h2>
+        <p>Send a few details and we'll reply within one working day. For a leak or no heat, ring instead.</p>
+      </div>
+      <a class="contact-phone" href="tel:+447700900382">07700 900382</a>
+      <p class="contact-email">hello@moorfieldplumbing.example</p>
+      <table class="hours">
+        <caption>Opening hours</caption>
+        <tbody>
+          <tr><th scope="row">Monday to Friday</th><td>7:30 – 18:00</td></tr>
+          <tr><th scope="row">Saturday</th><td>8:00 – 13:00</td></tr>
+          <tr><th scope="row">Sunday</th><td>Closed</td></tr>
+          <tr class="urgent"><th scope="row">Leaks and no heat</th><td>24/7</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Each input has a <label> linked by matching "for" and "id",
+         so tapping the label focuses the box (and screen readers read it out). -->
+    <form class="quote" id="quote-form">
+      <h3>Tell us about the job</h3>
+      <div class="field-row">
+        <div class="field">
+          <label for="q-name">Your name</label>
+          <input id="q-name" name="name" type="text" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="q-phone">Phone number</label>
+          <input id="q-phone" name="phone" type="tel" autocomplete="tel" required>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="q-postcode">Postcode</label>
+          <input id="q-postcode" name="postcode" type="text" autocomplete="postal-code">
+        </div>
+        <div class="field">
+          <label for="q-job">Type of job</label>
+          <select id="q-job" name="job">
+            <option>Leak or tap repair</option>
+            <option>Boiler service or repair</option>
+            <option>New boiler</option>
+            <option>Gas safety certificate</option>
+            <option>Bathroom refit</option>
+            <option>Something else</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="q-details">What's happening?</label>
+        <textarea id="q-details" name="details" placeholder="For example: the kitchen tap drips constantly and the cupboard underneath is damp."></textarea>
+      </div>
+      <button class="btn btn-primary" type="submit">Send my details</button>
+      <p class="form-note" id="form-note" role="status" hidden></p>
+    </form>
+  </div>
+</section>
+
+
+<!-- ===== FOOTER =====  EDIT ME -->
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Moorfield Plumbing &amp; Heating · Gas Safe reg. no. 000000 (demo)</p>
+    <p>A fictional business made as a portfolio demo.</p>
+  </div>
+</footer>
+
+
+<!-- ===== MOBILE CALL BAR =====
+     Stays stuck to the bottom of the screen on phones,
+     so "Call" is always one tap away. Hidden on wider screens. -->
+<nav class="call-bar" aria-label="Quick contact">
+  <a class="btn btn-primary" href="tel:+447700900382">Call now</a>
+  <a class="btn btn-ghost" href="#quote">Free quote</a>
+</nav>
+
+
+<script>
+  // QUOTE FORM
+  // This demo has nowhere to send messages, so it shows a thank-you note instead.
+  // On a live site, delete this script and connect the form to Netlify Forms or Formspree.
+  const form = document.getElementById('quote-form');
+  const note = document.getElementById('form-note');
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault(); // stop the browser trying to send the form somewhere
+    const name = form.elements.name.value.trim();
+    note.textContent = 'Thanks' + (name ? ', ' + name : '') +
+      '. This is a demo, so nothing was sent. On a live site, this message would go to the business by email.';
+    note.hidden = false;
+    form.reset();
+  });
+</script>
+
+</body></html>
